@@ -1,0 +1,35 @@
+# Python y entornos
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+# MLflow: datos de ejecución locales, no entregables
+*.db
+*.db-shm
+*.db-wal
+mlartifacts/
+mlruns/
+# Temporales, secretos, editores
+tmp/
+.env
+.env.*
+!.env.example
+.databrickscfg
+.aws/
+.ipynb_checkpoints/
+.DS_Store
+.vscode/
+.idea/
+# Auxiliares LaTeX
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz

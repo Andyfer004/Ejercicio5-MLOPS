@@ -1,0 +1,10 @@
+{
+  "upstream_repository": "https://github.com/DiegoLinares11/MLFlow",
+  "upstream_commit": "bd619c3cea3eb2d00fb6732e2993530d87de3f39",
+  "sha256": {
+    "referencias/Codigo_MLflow_Databricks.zip": "756d32fff9f7857f9b0e71ad7991a7472b866c6582f2293faa9e61e9cacb1eb9",
+    "referencias/MLflow_Databricks_original.pdf": "6122928001bd4b8c17315a79a62bf900ef92a056c7c89154e3394572299f0ece",
+    "referencias/Taller3_MLOPS.pdf": "6bc328e95c85eb739625a656ab030e72b2d18d770ff47a6dd372bfd32ec0f7d9",
+    "src/taller3_pipeline/datasets/champions_league_matches.csv": "be6ec27b6e95b5791196505850567534425987318742ac5f177b9e110061773c"
+  }
+}
