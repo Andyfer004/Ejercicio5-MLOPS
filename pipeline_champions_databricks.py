@@ -7,7 +7,14 @@ Instalar este proyecto antes de ejecutar: python -m pip install -e .
 import argparse
 import hashlib
 import json
+import sys
 from pathlib import Path
+
+
+# Permite importar el paquete fuente tras reiniciar Python o al ejecutar con runpy.
+_RUTA_SRC = str(Path(__file__).resolve().parent / "src")
+if _RUTA_SRC not in sys.path:
+    sys.path.insert(0, _RUTA_SRC)
 
 
 def ejecutar(experimento, familia='svc', n_iter=40, folds=5, modelo_uc=None,

@@ -1,14 +1,26 @@
-# Guía de ejecución y entrega
+# Guía de ejecución y cierre
 
-Esta guía adapta la del ZIP recibido. Las instrucciones vigentes de instalación, notebook y archivo Python están en [README.md](README.md#ejecutar-ambos-formatos-en-databricks).
+El laboratorio ya fue ejecutado por el usuario en ambos formatos en Databricks. La evidencia recibida se publica en [VALIDACION_DATABRICKS.md](VALIDACION_DATABRICKS.md) y [reporte/evidencias/](reporte/evidencias/). Durante este cierre no se volvió a entrenar en Databricks ni se modificaron sus permisos.
 
-1. Utilice en Databricks el Git folder de **https://github.com/Andyfer004/Ejercicio5-MLOPS.git** y abra `notebooks/Champions_Databricks.ipynb`.
-2. Instale este paquete desde la raíz real del workspace y reinicie Python antes de las importaciones si se solicita. Las dependencias se declaran en `pyproject.toml`; el CSV está incluido en el paquete.
-3. Configure `URI = "databricks"`, una ruta real de experimento y una prueba de 2 iteraciones / 3 folds. Luego ejecute con 40 / 5 para la búsqueda completa.
-4. Ejecute también el script raíz con el bloque `runpy` del README. Esto usa su punto de entrada y registra un run con `formato=python`; el notebook registra `formato=notebook`.
-5. Compruebe Experiments, Tracking y el MLflow Model. Debe existir el artefacto `evaluacion/verificacion_recarga.json` con `model_reload_verified: true`. Unity Catalog es opcional y requiere los permisos indicados en el README.
-6. Guarde capturas de ambos runs, sus parámetros, métricas y modelo. Exporte el notebook ejecutado sin credenciales y actualice el archivo de `notebooks/`.
-7. Comparta el notebook con el docente, copie el enlace real y agréguelo al README y a la sección 5 de `reporte/MLflow_Databricks.tex`. Recompile el PDF con Tectonic y revise su presentación.
-8. Revise `git diff` y publique los nuevos entregables en este repositorio. Entregue el PDF, el enlace de GitHub y el enlace real de Databricks. Canva ya está preparado.
+## Consultar los entregables
 
-No se ha establecido conexión con Databricks en esta preparación. Las métricas históricas del PDF y del notebook de referencia son del Taller 3, no de Databricks. No las sustituya por resultados de una prueba corta ni declare ejecuciones que aún no realizó.
+- [Repositorio](https://github.com/Andyfer004/Ejercicio5-MLOPS).
+- [Notebook real en Databricks](https://dbc-5490c6a5-5215.cloud.databricks.com/editor/notebooks/2665096834519332?o=7474655525361249).
+- [Notebook en GitHub](notebooks/Champions_Databricks.ipynb), [script](pipeline_champions_databricks.py) y [PDF final](reporte/MLflow_Databricks.pdf).
+- [JSON recibido](reporte/evidencias/resultados_databricks.json) y capturas de configuración y resultado del notebook en la misma carpeta.
+
+## Configuración reproducible
+
+La configuración publicada es `URI="databricks"`, `EXPERIMENTO="/Users/fue22944@uvg.edu.gt/Champions_Resultado_Databricks"`, `FAMILIA="svc"`, `N_ITER=40`, `FOLDS=5`, `MODELO_UC=None`.
+
+El notebook detecta la raíz desde su ubicación conocida y el directorio actual, y añade raíz y `src/` a `sys.path`. Si serverless usa otro directorio, configure `RUTA_WORKSPACE` con la ruta absoluta real del Git folder. Ejecute esa celda después de cada reinicio de Python; la importación no depende de que sobreviva la instalación editable. Las dependencias externas sí deben existir en el entorno.
+
+El archivo `.py` se ejecutó desde una celda con `runpy.run_path(..., run_name="__main__")`, conservando/restaurando `sys.argv`. No fue un Job independiente. La celda `runpy` está incluida sin salidas inventadas; repetirla deliberadamente crearía un run distinto. Los modelos se guardaron con MLflow Models y `version=null`, sin versión en Unity Catalog, sin alias nuevo ni endpoint.
+
+Para ejecutar en local, seleccione explícitamente SQLite y un experimento local antes de entrenar; consulte [README](README.md#ejecutar-el-jupyter-notebook-localmente). Una prueba local no constituye una nueva validación de Databricks.
+
+## Procedencia y entrega
+
+No se recibió un notebook ejecutado exportado ni estaba incorporado en el remoto al iniciar el cierre. Se conservan las celdas existentes, se corrigen rutas/configuración y se documentan los resultados en Markdown/JSON. Los contadores y salidas del notebook de entrega siguen vacíos. Las capturas son las suministradas por el usuario; no se generaron logs ni capturas adicionales.
+
+Entregables: PDF final, enlace de GitHub y enlace real del notebook. Los enlaces del workspace mantienen sus permisos existentes. El reporte y su fuente final se incorporaron íntegros desde los adjuntos; para recompilar con sus imágenes relativas use `cd reporte && tectonic MLflow_Databricks.tex`.

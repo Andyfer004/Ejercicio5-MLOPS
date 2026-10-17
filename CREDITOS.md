@@ -11,3 +11,5 @@ Los adjuntos `Codigo_MLflow_Databricks.zip` y `MLflow_Databricks.pdf` se conserv
 Las métricas publicadas en el reporte final pertenecen a la página 10 del Taller 3 original. Las salidas del notebook 03 también son históricas. Los resultados de la validación local de esta adaptación se documentan aparte. No se atribuyen a Databricks.
 
 El repositorio original no declaraba una licencia en el commit consultado. Se conserva su autoría y no se añade una licencia de terceros ni se atribuye la implementación original como trabajo nuevo.
+
+Para el cierre se recibieron `Cierre_MLflow_Databricks.zip` y el PDF final. Su fuente LaTeX, imágenes, JSON y cierre Markdown se incorporan íntegros en `reporte/`. Los dos runs reales de Databricks son evidencia suministrada por el usuario y observada por este en Databricks; se documentan en `VALIDACION_DATABRICKS.md` sin convertir las cifras históricas del Taller 3 en resultados nuevos.

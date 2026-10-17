@@ -6,6 +6,7 @@
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{geometry}
 \usepackage{hyperref}
+\usepackage{xurl}
 \usepackage{enumitem}
 \usepackage{microtype}
 \usepackage{mathpazo}
@@ -64,126 +65,179 @@
 
 %==================================================
 
-\section{Introducción y alcance}
-Este informe investiga el uso de MLflow en Databricks a partir del pipeline de Champions League del Taller 3 y la Actividad 9, publicado en el repositorio original de Diego Linares [6]. Se analiza su relación con CRISP-DM y la integración del pipeline mediante un notebook y un archivo Python.
 
-MLflow permite organizar experimentos y empaquetar modelos; Databricks integra estas capacidades con su plataforma de datos. El registro gobernado en Unity Catalog y la publicación mediante Model Serving permiten continuar el ciclo de vida después del entrenamiento [1, 3].
+\section{Introducción y objetivo}
+Se investigó el uso de MLflow en la plataforma Databricks y se adaptó el pipeline de scikit-learn del proyecto Champions League, desarrollado en el Taller 3 y la Actividad 9 [6]. El objetivo fue centralizar el seguimiento de entrenamiento, conservar modelos reutilizables y comprobar la misma lógica desde un Jupyter Notebook y un archivo Python.
 
-\subsection{¿Qué usos puede tener para proyectos de Machine Learning?}
+La implementación se ejecutó en Databricks Free Edition con compute Serverless. Ambos formatos completaron la búsqueda de hiperparámetros de SVC, guardaron el modelo y verificaron su recarga. Este reporte presenta los resultados de esas ejecuciones, realizadas el 16 de octubre de 2026, hora de Guatemala.
+
+\subsection{MLflow y su integración con Databricks}
+MLflow organiza ejecuciones y empaqueta modelos. Databricks ofrece un servicio administrado de seguimiento y herramientas integradas para continuar su ciclo de vida [1]. En esta implementación, \texttt{uri="databricks"} dirige los registros al workspace y una ruta absoluta identifica el experimento [2].
+
+Las funcionalidades aplicadas son: \textbf{Experiments}, para agrupar ejecuciones; \textbf{Tracking}, para conservar parámetros, métricas y artefactos; \textbf{Dataset Tracking}, para relacionar los datos con cada run; y \textbf{MLflow Models}, para guardar y cargar el pipeline completo [2, 5]. Model Registry en Unity Catalog, Feature Store y Model Serving forman parte del ecosistema, con configuración y objetivos específicos [1, 3, 4].
+
+\subsection{¿Qué usos puede tener en proyectos de Machine Learning?}
 \begin{itemize}
-\item \textbf{Comparación de experimentos:} conservar hiperparámetros y resultados para elegir una configuración con evidencia [2].
-\item \textbf{Trazabilidad:} relacionar cada ejecución con métricas, archivos y contexto del entrenamiento [2].
-\item \textbf{Reutilización:} guardar y cargar un pipeline completo, incluyendo transformaciones y clasificador [5].
-\item \textbf{Colaboración:} centralizar versiones y controlar su acceso mediante Unity Catalog [3].
-\item \textbf{Operación:} integrar modelos con servicios de inferencia; publicar un modelo requiere configurar el servicio adicional [1].
+\item Comparar configuraciones y modelos mediante métricas registradas.
+\item Mantener trazabilidad de los datos y parámetros usados en cada entrenamiento.
+\item Compartir resultados del equipo sin depender de salidas aisladas de notebooks.
+\item Recuperar el pipeline con sus transformaciones y firma para realizar inferencia.
+\item Preparar procesos de versionado y operación con servicios adicionales de la plataforma.
 \end{itemize}
 
-\subsection{Implementación de referencia: Taller 3}
-La base es el trabajo \textit{MLflow con scikit-learn} proporcionado por el equipo [6]. Utiliza el dataset de partidos de Champions League y compara SVC, regresión logística, HistGradientBoosting y Random Forest. El repositorio ya contiene un notebook de integración, módulos Python, seguimiento de datos y registro de modelos.
-
-Por ello, el objetivo de esta entrega es trasladar esa implementación a Databricks: conservar el pipeline y cambiar la configuración de seguimiento, las rutas del experimento y, si se utiliza, el registro gobernado en Unity Catalog. La integración reutiliza el preprocesamiento, los clasificadores y las funciones de seguimiento desarrolladas en el taller.
-
-\subsection{Usos en este proyecto}
-Se pueden comparar familias por F1 macro, identificar los datos usados por cada run y recuperar el modelo seleccionado por versión o alias. La misma base permite documentar cambios del preprocesamiento y repetir búsquedas de hiperparámetros. Las variables incluyen estadísticas observadas durante el partido. Por ello, esta evaluación clasifica resultados con datos del encuentro; no demuestra capacidad de pronóstico antes del partido.
+En Champions League, estas capacidades permiten evaluar variantes del clasificador y conservar evidencia de la configuración elegida. Las variables incluyen estadísticas del encuentro: el ejercicio clasifica resultados con datos observados durante el partido y no demuestra capacidad de pronóstico previo.
 
 \newpage
-\section{¿Qué etapas de CRISP-DM puede cubrir?}
-La siguiente relación es un análisis metodológico del equipo. MLflow apoya especialmente modelado y evaluación; junto con Databricks también participa en preparación y despliegue. El criterio del negocio y la interpretación de datos siguen siendo responsabilidad del equipo.
+\section{Cobertura de las etapas de CRISP-DM}
+La relación siguiente es el análisis metodológico del equipo. MLflow apoya de forma directa el modelado y la evaluación; el trabajo del equipo y las herramientas de datos de Databricks complementan las demás etapas.
 
-\renewcommand{\arraystretch}{1.38}
-\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth} >{\raggedright\arraybackslash}p{0.55\textwidth} >{\raggedright\arraybackslash}p{0.16\textwidth}@{}}
+\renewcommand{\arraystretch}{1.3}
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.22\textwidth} >{\raggedright\arraybackslash}p{0.54\textwidth} >{\raggedright\arraybackslash}p{0.16\textwidth}@{}}
 \toprule
-\textbf{Etapa} & \textbf{Aplicación concreta} & \textbf{Cobertura}\\
+\textbf{Etapa} & \textbf{Aplicación en el proyecto} & \textbf{Apoyo}\\
 \midrule
-Comprensión del negocio & Documentar objetivo, supuestos y criterio de éxito en notas o etiquetas. La herramienta no define la necesidad del negocio. & Indirecta\\
-Comprensión de los datos & Conservar referencias y archivos de diagnóstico. El análisis exploratorio se realiza con notebooks y herramientas de datos. & Parcial\\
-Preparación de los datos & Guardar el preprocesamiento dentro del pipeline. Feature Store añade reutilización de variables en la plataforma. & Parcial\\
-Modelado & Registrar cada configuración, entrenar modelos y conservar el pipeline y sus dependencias. & Directa\\
-Evaluación & Comparar métricas de validación y conservar resultados del conjunto de prueba; revisar también criterios de negocio. & Directa\\
-Despliegue & Versionar el modelo y cargarlo para inferencia. Model Serving y Jobs requieren configuración adicional en Databricks. & Con integración\\
+Comprensión del negocio & Definir la clasificación del resultado del partido y el criterio de éxito; documentar el propósito mediante notas y etiquetas. & Indirecto\\
+Comprensión de datos & Identificar filas vacías, clases desbalanceadas, porcentajes, razones y columnas que revelan la respuesta. Relacionar datasets con los runs. & Parcial\\
+Preparación de datos & Encapsular conversiones, imputación, escalado y codificación en el pipeline. Feature Store permite ampliar la reutilización de variables. & Parcial\\
+Modelado & Calibrar SVC con RandomizedSearchCV y conservar parámetros de la búsqueda y del clasificador. & Directo\\
+Evaluación & Registrar F1 macro de validación y prueba, exactitud y referencia; conservar artefactos y verificar la recarga. & Directo\\
+Despliegue & Guardar el modelo reutilizable. Model Registry y Model Serving amplían el proceso hacia versiones gobernadas y endpoints. & Integración\\
 \bottomrule
 \end{tabular}
 
-\subsection{Correspondencia con Champions League}
-\begin{enumerate}
-\item \textbf{Preparación:} eliminar filas vacías y columnas que revelan el resultado; convertir porcentajes y razones; imputar, escalar y codificar categorías dentro del pipeline.
-\item \textbf{Modelado:} ajustar las familias mediante RandomizedSearchCV, con F1 macro y validación estratificada.
-\item \textbf{Evaluación:} comparar validación y prueba con la referencia de clase mayoritaria; conservar la matriz de confusión.
-\item \textbf{Despliegue:} el taller registra la SVC con el alias \texttt{campeon}; en Databricks debe configurarse el registro correspondiente.
-\end{enumerate}
+\subsection{Aplicación y alcance}
+El objetivo y la interpretación de resultados siguen siendo responsabilidad del equipo. En este laboratorio se completaron entrenamiento, evaluación, seguimiento y recuperación del modelo. El pipeline se guardó en MLflow, sin crear una versión en Unity Catalog ni un endpoint. La disponibilidad de un modelo guardado es un paso útil para su operación, pero no equivale por sí misma a un servicio desplegado.
 
 \newpage
-\section{Adaptación del pipeline de Champions League}
-\subsection{Estructura de la implementación}
-El notebook \texttt{03\_pipeline\_sklearn\_mlflow.ipynb} integra el pipeline del taller. El archivo \texttt{seguimiento.py} contiene \texttt{entrenar\_familia}, que registra parámetros, métricas, datasets, matriz de confusión, resultados de búsqueda y el modelo completo [6].
+\section{Implementación del pipeline}
+\subsection{Datos y preprocesamiento}
+El CSV contiene 151 filas iniciales. Tras retirar separadores vacíos quedan 144 partidos válidos. Se utilizaron 115 observaciones para entrenamiento y 29 para prueba, con partición estratificada y semilla 42. La variable objetivo representa victoria local, victoria visitante o empate.
 
-El pipeline usa \texttt{ColumnTransformer} para variables numéricas, porcentajes, razones y categorías; aplica imputación, escalado y One-Hot Encoding, y después \texttt{SelectKBest} y el clasificador. Conserva los transformadores propios del paquete.
+Se excluyeron \texttt{score} y \texttt{winner} para evitar que la respuesta forme parte de las entradas. \texttt{ColumnTransformer} procesa grupos numéricos, porcentajes como texto, razones y equipos; aplica conversiones, imputación, escalado y One-Hot Encoding. El pipeline incorpora \texttt{SelectKBest} y el clasificador. El preprocesamiento se ajusta dentro de cada fold de la búsqueda.
 
-\subsection{Resultados reportados por el equipo}
-\renewcommand{\arraystretch}{1.2}
-\begin{tabular}{lrrr}
-\toprule
-Familia & F1 macro CV & Exactitud prueba & F1 macro prueba\\
-\midrule
-SVC & 0.638 & 0.655 & 0.601\\
-Regresión logística & 0.611 & 0.621 & 0.542\\
-HistGradientBoosting & 0.600 & 0.621 & 0.579\\
-Random Forest & 0.583 & 0.621 & 0.576\\
-\bottomrule
-\end{tabular}
+\subsection{Entrenamiento y configuración}
+Se reutilizó \texttt{entrenar\_familia} del módulo de seguimiento del Taller 3. Se optimizó F1 macro mediante RandomizedSearchCV, con 40 configuraciones y cinco particiones de validación estratificada. La búsqueda se realiza sobre entrenamiento; el conjunto de prueba se conserva para evaluación.
 
-\noindent\textit{Fuente: Taller 3 original, registro manual, página 10 [6]. Estas cifras pertenecen al trabajo original; no son resultados de esta adaptación ni de una ejecución en Databricks.}
-
-\subsection{Cambio para ejecutar en Databricks}
-La integración utiliza el servidor de seguimiento administrado de Databricks y una ruta de experimento dentro del workspace:
 \begin{lstlisting}[language=Python]
-from taller3_pipeline.seguimiento import (
-    configurar_mlflow, entrenar_familia)
-
-# La ruta del experimento se configura por usuario.
-configurar_mlflow(
-    experimento="/Users/usuario/Champions_Resultado",
-    uri="databricks")
-resultado = entrenar_familia(
-    "svc", n_iter=40, folds=5, n_jobs=1)
+URI = "databricks"
+EXPERIMENTO = (
+    "/Users/fue22944@uvg.edu.gt/"
+    "Champions_Resultado_Databricks"
+)
+FAMILIA = "svc"
+N_ITER = 40
+FOLDS = 5
+MODELO_UC = None
 \end{lstlisting}
-El notebook de entrega importa la función del archivo Python de la raíz; ambos reutilizan el mismo paquete instalado y su CSV incluido. La lectura del dataset no depende del directorio de trabajo. La URI de seguimiento es configurable para validar localmente con SQLite y ejecutar después con el servicio administrado de Databricks. El registro opcional en Unity Catalog requiere un nombre \texttt{catalogo.esquema.modelo} y permisos [3]. El alcance de la implementación comprende Experiments, Tracking, Dataset Tracking y MLflow Models. Se guarda el pipeline con su firma, ejemplo de entrada y código de los transformadores, y se comprueba su recarga calculando nuevamente el F1 macro de prueba. La implementación se entrega preparada para Databricks; no se ha ejecutado ni validado en ese servicio. El registro de una versión en Unity Catalog es opcional y no equivale a desplegar un endpoint.
+
+\subsection{Notebook y archivo Python}
+El notebook importa \texttt{ejecutar} del archivo Python de la raiz. Para resolver los módulos propios se incorporaron a \texttt{sys.path} la raiz del repositorio y su carpeta \texttt{src}. Se instaló el proyecto en el entorno del notebook y se reinició Python antes de importar las bibliotecas.
+
+El notebook ejecutó la función con \texttt{formato="notebook"}. Posteriormente se probó el archivo \texttt{.py} mediante \texttt{runpy.run\_path(..., run\_name="\_\_main\_\_")} y argumentos de línea de comandos, dentro del mismo entorno de Databricks. Esta segunda ejecución valida el punto de entrada del script; no corresponde a un Job independiente.
+
+\newpage
+\section{Resultados verificados en Databricks}
+Las dos ejecuciones completas utilizaron la misma configuración y partición. Las cifras siguientes proceden de las salidas reales del notebook y del archivo Python en Databricks, no de una nueva prueba local.
+
+\renewcommand{\arraystretch}{1.22}
+\noindent\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Métrica} & \textbf{Notebook} & \textbf{Python}\\
+\midrule
+F1 macro de validación cruzada & 0.637570 & 0.637570\\
+Desviación estándar de F1 en CV & 0.051826 & 0.051826\\
+Exactitud de prueba & 0.655172 & 0.655172\\
+F1 macro de prueba & 0.601010 & 0.601010\\
+F1 macro de referencia & 0.217054 & 0.217054\\
+Recarga del modelo verificada & Sí & Sí\\
+\bottomrule
+\end{tabular}
+
+\subsection{Hiperparámetros seleccionados}
+\begin{itemize}
+\item \texttt{C = 0.17535949529764422}.
+\item \texttt{class\_weight = balanced} y \texttt{kernel = linear}.
+\item \texttt{gamma = 0.04609877941534893}; se conserva como parámetro de la búsqueda, aunque no interviene cuando el kernel de SVC es lineal.
+\end{itemize}
+
+\subsection{Interpretación}
+La exactitud de prueba de 65.52\% corresponde a 19 aciertos entre 29 partidos. El F1 macro de 0.601010 supera la referencia de clase mayoritaria de 0.217054. La igualdad entre ambos formatos muestra consistencia de la ejecución bajo la configuración utilizada; la recarga reprodujo el F1 macro de prueba.
+
+La prueba inicial de dos iteraciones y tres folds obtuvo F1 macro de prueba de 0.646825. Esa cifra aislada no se utiliza para seleccionar el modelo: la búsqueda completa selecciona hiperparámetros por validación cruzada, y su esquema de validación es distinto. El conjunto de prueba pequeño limita la generalización de cualquier cifra individual.
+
+Las cifras completas coinciden con la SVC reportada en el Taller 3. Las demás familias del taller son antecedentes y no se presentan como nuevas ejecuciones de esta entrega.
+
+\subsection{Estado del modelo}
+Ambos modelos quedaron guardados con una URI de MLflow Models y su recarga fue verificada. El valor \texttt{version=null} indica ausencia de una versión registrada en Model Registry; no significa que haya fallado el guardado. Se mantuvo \texttt{MODELO\_UC=None}, sin registrar versiones ni alias en Unity Catalog y sin publicar Model Serving.
+
+\newpage
+\section{Trazabilidad y enlaces de entrega}
+\subsection{Acceso al código y al notebook}
+\noindent\textbf{Repositorio de GitHub:}\\
+\url{https://github.com/Andyfer004/Ejercicio5-MLOPS}
+
+\noindent\textbf{Notebook en el workspace de Databricks:}\\
+\href{https://dbc-5490c6a5-5215.cloud.databricks.com/editor/notebooks/2665096834519332?o=7474655525361249}{Abrir Champions\_Databricks en Databricks}
+
+\noindent\textbf{Notebook en GitHub:}\\
+\href{https://github.com/Andyfer004/Ejercicio5-MLOPS/blob/main/notebooks/Champions_Databricks.ipynb}{notebooks/Champions\_Databricks.ipynb}
+
+\noindent\textbf{Archivo Python en GitHub:}\\
+\href{https://github.com/Andyfer004/Ejercicio5-MLOPS/blob/main/pipeline_champions_databricks.py}{pipeline\_champions\_databricks.py}
+
+\subsection{Identificadores de las ejecuciones}
+\noindent\textbf{Notebook:}\\
+Run: \path{bfe4871fb7324ad8953efb6bb7fa33cb}\\
+Modelo: \path{models:/m-39d842fe62224cad9b83571b60c45968}\\
+\href{https://dbc-5490c6a5-5215.cloud.databricks.com/ml/experiments/2665096834519373/runs/bfe4871fb7324ad8953efb6bb7fa33cb?o=7474655525361249}{Abrir run del notebook}
+
+\noindent\textbf{Archivo Python:}\\
+Run: \path{79e0d6ade66c4631b2cb47482a6b49f3}\\
+Modelo: \path{models:/m-fa7ce8e782ae498fb1a3f6bdecababdb}\\
+\href{https://dbc-5490c6a5-5215.cloud.databricks.com/ml/experiments/2665096834519373/runs/79e0d6ade66c4631b2cb47482a6b49f3?o=7474655525361249}{Abrir run del archivo Python}
+
+\subsection{Registros y reproducibilidad}
+El código registra parámetros, métricas, datasets de entrenamiento y prueba, resultados de búsqueda, matriz de confusión, reporte de clasificación y el modelo con firma y código de transformadores. La comprobación de recarga genera \path{evaluacion/verificacion_recarga.json} y contrasta el F1 de prueba. Los enlaces de Databricks requieren los permisos correspondientes del workspace.
+
+La implementación conserva la procedencia del pipeline y del dataset del Taller 3, publicado por Diego Linares, con autoría de los cuatro integrantes [6].
+
+\newpage
+\section{Evidencia de ejecución}
+\subsection{Configuración completa}
+La captura muestra el servidor administrado de Databricks, la familia SVC, 40 iteraciones, cinco folds y el registro opcional de Unity Catalog desactivado.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth,height=18cm,keepaspectratio]{evidencias/configuracion_databricks.png}
+\caption{Configuración ejecutada en Databricks. Captura proporcionada por el equipo.}
+\end{figure}
+
+\newpage
+\subsection{Salida del notebook}
+La captura registra el run del notebook, el modelo guardado, los hiperparámetros y las métricas. El resultado completo de ambos formatos se resume en la sección 4 y sus identificadores se conservan en la sección 5.
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth,height=19cm,keepaspectratio]{evidencias/resultado_notebook.png}
+\caption{Salida de la búsqueda completa de SVC en Databricks. Captura proporcionada por el equipo.}
+\end{figure}
 
 \newpage
 \section{Conclusiones}
-MLflow permite conservar la relación entre datos, hiperparámetros, métricas y modelos. En el proyecto de Champions League facilita comparar familias con F1 macro y recuperar el pipeline completo, incluyendo sus transformaciones.
+Se ejecutó la integración de scikit-learn y MLflow en Databricks tanto desde un notebook como desde un archivo Python. Ambos formatos obtuvieron el mismo F1 macro de validación de 0.637570 y F1 macro de prueba de 0.601010, con recarga verificada del modelo.
 
-La integración con Databricks centraliza los experimentos en un workspace y utiliza el mismo código de entrenamiento desde un notebook o un archivo Python. El registro manual permite conservar la métrica de validación, los resultados de prueba y los artefactos de evaluación de forma explícita.
+MLflow permitió vincular las ejecuciones con sus parámetros, métricas y modelos. La implementación conserva las transformaciones del pipeline y utiliza validación cruzada para seleccionar hiperparámetros, proporcionando trazabilidad y una forma consistente de recuperar el modelo.
 
-MLflow ofrece apoyo directo en modelado y evaluación dentro de CRISP-DM. Las herramientas de datos y gobierno de Databricks amplían su participación en preparación y despliegue. El valor de la solución consiste en mantener un proceso trazable y reproducible, con una selección de modelos basada en evidencia.
+Dentro de CRISP-DM, el aporte más directo se encuentra en modelado y evaluación. Databricks amplía el soporte a preparación, colaboración y operación mediante servicios complementarios. El alcance demostrado en este laboratorio es Experiments, Tracking, Dataset Tracking y Models.
 
-\section{Repositorio y código del proyecto}
-\noindent\textbf{Repositorio de esta entrega:}\\
-\url{https://github.com/Andyfer004/Ejercicio5-MLOPS}
-
-\noindent\textbf{Notebook de entrega:}\\
-\href{https://github.com/Andyfer004/Ejercicio5-MLOPS/blob/main/notebooks/Champions_Databricks.ipynb}{notebooks/Champions\_Databricks.ipynb}
-
-\noindent\textbf{Archivo Python:}\\
-\href{https://github.com/Andyfer004/Ejercicio5-MLOPS/blob/main/pipeline_champions_databricks.py}{pipeline\_champions\_databricks.py}
-
-\noindent\textbf{Paquete y notebook de referencia:}\\
-\texttt{src/taller3\_pipeline/} y
-\texttt{notebooks/03\_pipeline\_sklearn\_mlflow.ipynb}.
-
-\noindent\textbf{Notebook en Databricks:} el enlace se incorporará después de ejecutar ambos formatos y compartir el notebook con el docente. No hay un enlace ni resultados de Databricks disponibles en esta preparación.
-
-\noindent\textbf{Procedencia y créditos:} pipeline y dataset reutilizados del Taller 3, publicado por Diego Linares, con autoría de Diego Linares, Andy Fuentes, Diederich Solís y Christian Echeverria. Versión de referencia: \texttt{bd619c3cea3e}. El README detalla la instalación y ejecución de ambos formatos.
-
-\section{Referencias oficiales}
-\footnotesize
-\begin{enumerate}[label={[\arabic*]},itemsep=0pt,topsep=2pt]
+\section{Referencias}
+\small
+\begin{enumerate}[label={[\arabic*]},itemsep=3pt]
 \item Databricks. \textit{MLflow on Databricks}.\\\url{https://docs.databricks.com/aws/en/mlflow/}
 \item Databricks. \textit{Track model development using MLflow}.\\\url{https://docs.databricks.com/aws/en/mlflow/tracking}
 \item Databricks. \textit{Manage model lifecycle in Unity Catalog}.\\\url{https://docs.databricks.com/aws/en/machine-learning/manage-model-lifecycle/}
 \item Databricks. \textit{Databricks Feature Store}.\\\url{https://docs.databricks.com/aws/en/machine-learning/feature-store/}
-\item MLflow. \textit{mlflow.sklearn: Python API}.\\\url{https://mlflow.org/docs/latest/api_reference/python_api/mlflow.sklearn.html}
-\item Equipo del curso. \textit{Taller 3: MLflow con scikit-learn}. Octubre de 2026. PDF original conservado en referencias/Taller3\_MLOPS.pdf y repositorio original: \url{https://github.com/DiegoLinares11/MLFlow}
+\item MLflow. \textit{API mlflow.sklearn}.\\\url{https://mlflow.org/docs/latest/api_reference/python_api/mlflow.sklearn.html}
+\item Equipo del curso. \textit{Taller 3: MLflow con scikit-learn}. Octubre de 2026. Pipeline, dataset y reporte de referencia.\\\url{https://github.com/DiegoLinares11/MLFlow}
+\item Equipo del curso. \textit{Ejecuciones de Champions League en Databricks}. 16 de octubre de 2026. Salidas de notebook y archivo Python, capturas y enlaces del workspace incluidos en este informe.
 \end{enumerate}
-\noindent Consulta: 16 de octubre de 2026.
+\noindent Fecha de consulta: 16 de octubre de 2026.
 \end{document}

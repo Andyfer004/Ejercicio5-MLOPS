@@ -1,0 +1,15 @@
+{
+  "procedencia": "Adjuntos finales proporcionados por el usuario; resultados observados por este en Databricks.",
+  "notebook_exportado_recibido": false,
+  "verificacion_remota_durante_cierre": false,
+  "archivo_zip_original": "Cierre_MLflow_Databricks.zip",
+  "sha256_zip_original": "a5e487843b2ab4b31c140234723f95c53fbfb45bc94a428348d1b6aefbeafd93",
+  "sha256": {
+    "reporte/MLflow_Databricks.pdf": "97f4f1cfb8535abda8e23effcaf606647748647dd9489ed78b0f871b79db56f5",
+    "reporte/MLflow_Databricks.tex": "73ab32784d034146f38486e54be33776e27573292c7bce84e5a9f3695d30dee2",
+    "reporte/evidencias/resultados_databricks.json": "86fdd68380c26140d6bf4479ea8f78bfb6b1dc0ee789e83bb17cc6516ba9b4da",
+    "reporte/evidencias/CIERRE_NOTEBOOK.md": "fe2caa9531149ac0ae09a8e62d1dd6c07e237a894d8d7424308f5f0391443c07",
+    "reporte/evidencias/configuracion_databricks.png": "a082c0420e4770f1ae1794100ef1f3b12673f0781cb438d40cbb36dd5a148e51",
+    "reporte/evidencias/resultado_notebook.png": "69424affd3d56672974888b73427f9a68a42267d0c93ac24b022ef66fc84e1b6"
+  }
+}

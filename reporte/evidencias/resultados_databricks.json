@@ -1,0 +1,67 @@
+{
+  "fecha_local": "2026-10-16",
+  "zona_horaria": "America/Guatemala",
+  "repositorio": "https://github.com/Andyfer004/Ejercicio5-MLOPS",
+  "notebook_databricks": "https://dbc-5490c6a5-5215.cloud.databricks.com/editor/notebooks/2665096834519332?o=7474655525361249",
+  "experimento": "/Users/fue22944@uvg.edu.gt/Champions_Resultado_Databricks",
+  "experiment_id": "2665096834519373",
+  "dataset": {
+    "filas_crudas": 151,
+    "partidos": 144,
+    "entrenamiento": 115,
+    "prueba": 29
+  },
+  "evidencia": "Resultados proporcionados por el usuario y observados en las salidas del notebook de Databricks.",
+  "runs": [
+    {
+      "formato": "notebook",
+      "run_id": "bfe4871fb7324ad8953efb6bb7fa33cb",
+      "model_uri": "models:/m-39d842fe62224cad9b83571b60c45968",
+      "version": null,
+      "parametros": {
+        "familia": "svc",
+        "n_iter": 40,
+        "cv_folds": 5,
+        "scoring": "f1_macro",
+        "C": 0.17535949529764422,
+        "class_weight": "balanced",
+        "gamma": 0.04609877941534893,
+        "kernel": "linear"
+      },
+      "metricas": {
+        "cv_f1_macro": 0.6375702586700029,
+        "cv_f1_macro_std": 0.05182572468993785,
+        "test_accuracy": 0.6551724137931034,
+        "test_f1_macro": 0.6010101010101011,
+        "baseline_test_f1_macro": 0.2170542635658915
+      },
+      "recarga_verificada": true,
+      "run_url": "https://dbc-5490c6a5-5215.cloud.databricks.com/ml/experiments/2665096834519373/runs/bfe4871fb7324ad8953efb6bb7fa33cb?o=7474655525361249"
+    },
+    {
+      "formato": "python",
+      "run_id": "79e0d6ade66c4631b2cb47482a6b49f3",
+      "model_uri": "models:/m-fa7ce8e782ae498fb1a3f6bdecababdb",
+      "version": null,
+      "parametros": {
+        "familia": "svc",
+        "n_iter": 40,
+        "cv_folds": 5,
+        "scoring": "f1_macro",
+        "C": 0.17535949529764422,
+        "class_weight": "balanced",
+        "gamma": 0.04609877941534893,
+        "kernel": "linear"
+      },
+      "metricas": {
+        "cv_f1_macro": 0.6375702586700029,
+        "cv_f1_macro_std": 0.05182572468993785,
+        "test_accuracy": 0.6551724137931034,
+        "test_f1_macro": 0.6010101010101011,
+        "baseline_test_f1_macro": 0.2170542635658915
+      },
+      "recarga_verificada": true,
+      "run_url": "https://dbc-5490c6a5-5215.cloud.databricks.com/ml/experiments/2665096834519373/runs/79e0d6ade66c4631b2cb47482a6b49f3?o=7474655525361249"
+    }
+  ]
+}

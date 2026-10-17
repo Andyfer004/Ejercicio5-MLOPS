@@ -18,7 +18,9 @@ Se reutiliza Champions League con SVC, regresión logística, HistGradientBoosti
 | Adjuntos recibidos sin modificar y reporte original | [referencias/](referencias/) |
 | Guía detallada de Databricks | [GUIA_EJECUCION.md](GUIA_EJECUCION.md) |
 
-**Notebook en Databricks:** pendiente de ejecución y de obtener su URL real. No se ha conectado a Databricks ni se presentan resultados de ese servicio. Después de ejecutar, agregue aquí el enlace compartido y actualice la sección 5 del fuente del reporte, recompilando el PDF. El contenido de Canva ya está elaborado y no se modifica.
+**Laboratorio ejecutado en ambos formatos en Databricks.** [Notebook real](https://dbc-5490c6a5-5215.cloud.databricks.com/editor/notebooks/2665096834519332?o=7474655525361249). Evidencia suministrada por el usuario y observada por este en Databricks: [validación y trazabilidad](VALIDACION_DATABRICKS.md), [JSON con precisión completa](reporte/evidencias/resultados_databricks.json) y [capturas](reporte/evidencias/).
+
+El notebook ejecutado no se recibió como archivo exportado ni estaba incorporado en `origin/main` al iniciar el cierre. El notebook de GitHub documenta la ejecución mediante Markdown/JSON y conserva celdas sin salidas; no se fabricaron outputs, contadores ni logs. El notebook 03 conserva las salidas históricas del Taller 3.
 
 ## Instalación local
 
@@ -59,39 +61,42 @@ python -m ipykernel install --prefix .venv --name champions-local --display-name
 jupyter lab notebooks/Champions_Databricks.ipynb
 ```
 
-Seleccione el kernel del entorno virtual y ejecute todas las celdas. La configuración inicial utiliza SQLite local con ruta absoluta y un experimento distinto al script. El notebook localiza la raíz desde `notebooks/` e importa `ejecutar` del script, sin duplicar el entrenamiento. El CSV se distribuye dentro del paquete.
-
-## Ejecutar ambos formatos en Databricks
-
-1. En Workspace, cree un **Git folder** de `https://github.com/Andyfer004/Ejercicio5-MLOPS.git`, rama `main`. Esto se realiza posteriormente dentro de Databricks; no requiere otro clon local. Use la integración GitHub de su cuenta para guardar cambios.
-2. Abra `notebooks/Champions_Databricks.ipynb` y seleccione un compute Python con instalación de paquetes habilitada. Copie la ruta real de la raíz del Git folder.
-3. En una celda separada instale el proyecto con `%pip install -e "/Workspace/Users/SU_USUARIO/Ejercicio5-MLOPS"`, sustituyendo la ruta. Si el entorno lo solicita, ejecute `dbutils.library.restartPython()` en otra celda, antes de las importaciones. En serverless gestione dependencias en el panel Environment cuando `%pip` o instalaciones editables estén restringidas; puede instalar una wheel construida con `python -m build`. Use compute compatible con las dependencias; no un SQL warehouse.
-4. En la configuración del notebook cambie `URI = "databricks"` y `EXPERIMENTO = "/Users/SU_CORREO/Champions_Resultado_Databricks"`. Sustituya el correo por el usuario real y use una carpeta sobre la que tenga permisos. Deje `MODELO_UC = None` para la primera ejecución.
-5. Ejecute todas las celdas con `N_ITER = 2`, `FOLDS = 3`. Compruebe recarga y artefactos. Luego use `N_ITER = 40`, `FOLDS = 5` y vuelva a ejecutar la celda de entrenamiento para la búsqueda completa.
-6. Ejecute el punto de entrada del archivo Python desde una celda del mismo notebook, con el mismo entorno:
+Seleccione el kernel del entorno virtual. Antes de ejecutar el entrenamiento, cambie explícitamente la configuración a modo local:
 
 ```python
-import runpy
-import sys
-
-argumentos_previos = sys.argv[:]
-try:
-    sys.argv = [
-        "pipeline_champions_databricks.py",
-        "--uri", "databricks",
-        "--experimento", EXPERIMENTO,
-        "--familia", "svc", "--n-iter", "40", "--folds", "5",
-    ]
-    runpy.run_path(str(RAIZ / "pipeline_champions_databricks.py"), run_name="__main__")
-finally:
-    sys.argv = argumentos_previos
+URI = "sqlite:///" + str(RAIZ / "mlflow.db")
+EXPERIMENTO = "Champions_Local_Notebook"
+# Opcional para una prueba corta local:
+N_ITER = 2
+FOLDS = 3
 ```
 
-7. En **Experiments** abra el experimento: habrá runs con etiquetas `formato=notebook` y `formato=python`. Revise parámetros, `cv_f1_macro`, `test_accuracy`, `test_f1_macro`, baseline, datasets training/testing, matriz de confusión, `busqueda/cv_results.csv`, modelo y `evaluacion/verificacion_recarga.json`.
-8. **Models**: `mlflow.sklearn.log_model` ya guarda un MLflow Model con firma, ejemplo de entrada y código de los transformadores. Opcionalmente configure un nombre real `catalogo.esquema.modelo` en `MODELO_UC`, o pase `--modelo-uc` al script. Se usa `databricks-uc`, se crea una versión y se asigna el alias `campeon`; debe hacerlo solo con el modelo que haya seleccionado por validación. Requiere Unity Catalog habilitado, compute compatible, `USE CATALOG`, `USE SCHEMA`, permisos para crear modelo/versiones y para cambiar su alias. No se configura Model Serving.
-9. Comparta el notebook con el docente mediante Share y copie su URL real. Guarde evidencia de ambos formatos, actualice README y reporte con ese enlace y suba el notebook ejecutado a GitHub. Confirme que el docente tenga acceso: conocer una URL no concede permisos.
+El valor publicado por defecto es `URI = "databricks"`, con 40 iteraciones y 5 folds. Una repetición local crea runs distintos de la evidencia suministrada. El notebook añade la raíz y `raíz/src` a `sys.path` e importa `ejecutar` del script, sin duplicar el entrenamiento. El CSV se distribuye dentro del paquete.
 
-Para automatización, cree después un Job con tarea Python script y los mismos argumentos. Instale el paquete y dependencias en el entorno del Job; las bibliotecas del notebook no se heredan automáticamente.
+## Ejecución documentada en Databricks
+
+El usuario completó ambos formatos en el mismo entorno de Databricks. El archivo `.py` se ejecutó mediante `runpy.run_path(..., run_name="__main__")` desde el notebook: **no fue un Job independiente**. Este cierre incorpora la evidencia, sin volver a entrenar en Databricks ni modificar permisos.
+
+Configuración utilizada y conservada en el notebook:
+
+```python
+URI = "databricks"
+EXPERIMENTO = "/Users/fue22944@uvg.edu.gt/Champions_Resultado_Databricks"
+FAMILIA = "svc"
+N_ITER = 40
+FOLDS = 5
+MODELO_UC = None
+```
+
+Para reproducirlo posteriormente de forma deliberada:
+
+1. Abra el Git folder de este mismo repositorio y `notebooks/Champions_Databricks.ipynb` en un compute Python. Instale sus dependencias según `pyproject.toml`; `%pip install -e "/ruta/real/Ejercicio5-MLOPS"` es una opción si el entorno la admite. Si reinicia Python, ejecute de nuevo la celda de rutas antes de las importaciones.
+2. La celda de rutas busca la raíz desde la ubicación conocida del notebook (incluido el contexto del workspace si está disponible) y desde el directorio actual. Añade tanto la raíz como `src/`, sin depender de la instalación editable. Si serverless usa otro directorio, establezca `RUTA_WORKSPACE` con la ruta absoluta real del repositorio; una ruta explícita inválida produce un error claro. La ruta del Git folder es distinta de la del experimento.
+3. Conserve la configuración anterior. Ejecutar la celda de entrenamiento o la celda `runpy` crea nuevas ejecuciones; los IDs registrados en la evidencia no se sustituyen por esos resultados posteriores.
+4. La celda del script preserva `sys.argv`, configura los argumentos y ejecuta el archivo raíz como `__main__`. El propio script también añade su `src/` para resolver el paquete tras un reinicio.
+5. En Experiments consulte los [runs suministrados](VALIDACION_DATABRICKS.md): parámetros, métricas, datasets, modelo y `evaluacion/verificacion_recarga.json`. Los dos modelos están guardados como MLflow Models con `version=null`: **sin versión registrada en Unity Catalog, sin alias nuevo y sin endpoint**.
+
+[Notebook en Databricks](https://dbc-5490c6a5-5215.cloud.databricks.com/editor/notebooks/2665096834519332?o=7474655525361249). El acceso depende de los permisos existentes del workspace, que no se modificaron.
 
 ## MLflow y CRISP-DM
 
@@ -99,9 +104,11 @@ Experiments agrupa ejecuciones; Tracking registra parámetros, métricas, datase
 
 ## Resultados y validación
 
-Las cifras SVC 0.638 (F1 macro CV), 0.655 (accuracy prueba) y 0.601 (F1 macro prueba), junto con las de otras familias del reporte, **proceden del Taller 3 original, página 10**. No corresponden a una ejecución nueva ni a Databricks. El notebook histórico conserva sus salidas originales identificadas como referencia.
+Los dos runs de Databricks suministrados por el usuario tienen F1 macro CV **0.6375702586700029**, desviación estándar **0.05182572468993785**, exactitud de prueba **0.6551724137931034**, F1 macro de prueba **0.6010101010101011** y referencia **0.2170542635658915**, con recarga verificada. Sus IDs y modelos están en [VALIDACION_DATABRICKS.md](VALIDACION_DATABRICKS.md) y el [JSON original recibido](reporte/evidencias/resultados_databricks.json).
 
-Véase [VALIDACION_LOCAL.md](VALIDACION_LOCAL.md) para lo ejecutado en esta adaptación. Las pruebas cortas no reproducen la comparación completa del taller.
+Las cifras históricas redondeadas del Taller 3 (SVC: 0.638 / 0.655 / 0.601) se conservan como antecedentes en el notebook 03 y el reporte original. La coincidencia numérica no cambia su procedencia: las ejecuciones de esta entrega se identifican por sus propios runs. No se presentan las otras familias históricas como nuevas ejecuciones en Databricks.
+
+[VALIDACION_LOCAL.md](VALIDACION_LOCAL.md) separa las pruebas locales iniciales y las comprobaciones de este cierre de la evidencia real en Databricks. El PDF final recibido contiene los resultados completos y sus enlaces; las pruebas locales cortas no los sustituyen.
 
 ```bash
 python -m pip install -e '.[dev]'
@@ -109,6 +116,6 @@ python -m pytest -q
 python -m build
 ```
 
-El PDF se regenera desde la raíz con `tectonic -o reporte reporte/MLflow_Databricks.tex` (requiere Tectonic; la primera compilación puede descargar paquetes TeX).
+El PDF se regenera desde la raíz con `cd reporte && tectonic MLflow_Databricks.tex` (requiere Tectonic; la primera compilación puede descargar paquetes TeX).
 
 Fuentes oficiales: [MLflow en Databricks](https://docs.databricks.com/aws/en/mlflow/), [Tracking](https://docs.databricks.com/aws/en/mlflow/tracking), [Models en Unity Catalog](https://docs.databricks.com/aws/en/machine-learning/manage-model-lifecycle/) y [API scikit-learn de MLflow](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.sklearn.html).
